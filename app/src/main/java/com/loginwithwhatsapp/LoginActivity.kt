@@ -1,15 +1,16 @@
 package com.loginwithwhatsapp
 
+import android.opengl.Visibility
 import android.os.Bundle
-import android.widget.Toast
-import androidx.annotation.Nullable
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.loginwithwhatsapp.databinding.ActivityLoginBinding
 import com.otpless.main.Otpless
 import com.otpless.main.OtplessIntentRequest
 import com.otpless.main.OtplessProvider
 import com.otpless.main.OtplessTokenData
-import kotlinx.coroutines.*
 
 
 class LoginActivity : AppCompatActivity() {
@@ -17,69 +18,46 @@ class LoginActivity : AppCompatActivity() {
     // declare otpless variable
     private var otpless: Otpless? = null
 
-
     private lateinit var binding: ActivityLoginBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val query: String? = intent.data?.query
-        var tokenValue: String? = null
-        if (query != null) {
-            tokenValue = query.split("=")[1]
-            verifyWhatsAppLogin(tokenValue)
-        }
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.login.setOnClickListener {
-            initiateWhatsAppLogin()
+        val viewModel: LoginViewModel = ViewModelProvider(this)[LoginViewModel::class.java]
+        intent.data?.query?.let {
+            viewModel.verifyWhatsAppLogin(it.split("=")[1])
         }
+
         //Initialize OTPLess Instance
         otpless = OtplessProvider.getInstance(this).init { response: OtplessTokenData? ->
-            onOtplessResult(
+            viewModel.onOtplessResult(
                 response
             )
         }
-    }
 
-    protected val scope = CoroutineScope(
-        Job() + Dispatchers.Main
-    )
-
-    fun initiateWhatsAppLogin() {
-        scope.launch {
-            val response =
-                RetrofitOTPClass().client?.create(WhatsAppLoginService::class.java)?.initiateLogin(
-                    OtpLessInitiateRequest("WHATSAPP")
-                )
-            response?.body()?.data?.intent?.let { initiateOtplessFlow(it) }
+        binding.login.setOnClickListener {
+            viewModel.initiateWhatsAppLogin()
         }
-    }
 
-    fun verifyWhatsAppLogin(token: String) {
-        scope.launch {
-            val response =
-                RetrofitOTPClass().client?.create(WhatsAppLoginService::class.java)?.verifyUSer(
-                    OtpLessUserDataValueRequest(token)
-                )
-            withContext(Dispatchers.Main) {
-                Toast.makeText(this@LoginActivity, response?.message(), Toast.LENGTH_LONG).show()
+        viewModel.intentLiveData.observe(this) { intent ->
+            intent?.let {
+                initiateOtplessFlow(it)
+            }
+        }
+
+        viewModel.verifyUserData.observe(this) { verifyUserData ->
+            verifyUserData?.let {
+                binding.login.visibility = GONE
+                binding.successLogin.visibility = VISIBLE
+                binding.successLogin.text = "Successful login by ${it.name} with phone number XXXXXXXXXX"
             }
         }
     }
 
-    //Call back function Where token is received
-    private fun onOtplessResult(@Nullable response: OtplessTokenData?) {
-        if (response == null) return
-
-        //Send this token to your backend end api to fetch user details from otpless service
-        val token: String = response.token
-        verifyWhatsAppLogin(token)
-    }
-
-    private fun initiateOtplessFlow(intentUri: String) {
-
+    fun initiateOtplessFlow(intentUri: String) {
         //While you create a request with otpless sdk you can define your own loading text and color
         val request: OtplessIntentRequest =
             OtplessIntentRequest(intentUri) //.setLoadingText("Please wait...")

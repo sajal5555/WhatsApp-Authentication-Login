@@ -1,4 +1,4 @@
-package com.loginwithwhatsapp
+package com.loginwithwhatsapp.webservices
 
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 
 class RetrofitOTPClass {
     companion object {
-        private val READ_TIMEOUT = 30L
+        private const val READ_TIMEOUT = 30L
         var retrofitOTP: Retrofit? = null
     }
 

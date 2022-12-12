@@ -1,13 +1,12 @@
-package com.loginwithwhatsapp
+package com.loginwithwhatsapp.models
 
-data class OtpLessUserData(
+data class VerifyUserVO(
     val responseCode: String,
     val message: String,
-    val data: OtpLessUserDataValue,
+    val data: VerifyUserData,
 )
 
-
-data class OtpLessUserDataValue(
+data class VerifyUserData(
     val name: String,
     val mobile: String,
     val stateMatched: Boolean,
@@ -15,6 +14,4 @@ data class OtpLessUserDataValue(
     val state: String?,
     val ip: String,
 )
-data class OtpLessUserDataValueRequest(
-    val token: String,
-)
+
