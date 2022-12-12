@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 
 class RetrofitOTPClass {
     companion object {
-        private val READ_TIMEOUT = 30L
+        private const val READ_TIMEOUT = 30L
         var retrofitOTP: Retrofit? = null
     }
 

@@ -17,7 +17,6 @@ class LoginActivity : AppCompatActivity() {
     // declare otpless variable
     private var otpless: Otpless? = null
 
-
     private lateinit var binding: ActivityLoginBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +31,7 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.login.setOnClickListener {
+        binding.login?.setOnClickListener {
             initiateWhatsAppLogin()
         }
         //Initialize OTPLess Instance
@@ -47,7 +46,7 @@ class LoginActivity : AppCompatActivity() {
         Job() + Dispatchers.Main
     )
 
-    fun initiateWhatsAppLogin() {
+    private fun initiateWhatsAppLogin() {
         scope.launch {
             val response =
                 RetrofitOTPClass().client?.create(WhatsAppLoginService::class.java)?.initiateLogin(
@@ -57,10 +56,10 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    fun verifyWhatsAppLogin(token: String) {
+    private fun verifyWhatsAppLogin(token: String) {
         scope.launch {
             val response =
-                RetrofitOTPClass().client?.create(WhatsAppLoginService::class.java)?.verifyUSer(
+                RetrofitOTPClass.retrofitOTP?.create(WhatsAppLoginService::class.java)?.verifyUSer(
                     OtpLessUserDataValueRequest(token)
                 )
             withContext(Dispatchers.Main) {
