@@ -1,4 +1,4 @@
-package com.loginwithwhatsapp
+package com.loginwithwhatsapp.webservices
 
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
