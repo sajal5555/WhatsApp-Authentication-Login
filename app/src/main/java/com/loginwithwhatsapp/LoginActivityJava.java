@@ -7,11 +7,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.loginwithwhatsapp.databinding.ActivityLoginBinding;
-import com.otpless.main.OnOtplessResult;
 import com.otpless.main.Otpless;
 import com.otpless.main.OtplessIntentRequest;
 import com.otpless.main.OtplessProvider;
-import com.otpless.main.OtplessTokenData;
 
 public class LoginActivityJava extends AppCompatActivity {
 
@@ -34,22 +32,9 @@ public class LoginActivityJava extends AppCompatActivity {
         }
 
         //Initialize OTPLess Instance
-        otpless = OtplessProvider.getInstance(this).init(new OnOtplessResult() {
-            @Override
-            public void onOtplessResult(OtplessTokenData otplessTokenData) {
-                viewModel.onOtplessResult(otplessTokenData);
+        otpless = OtplessProvider.getInstance(this).init(viewModel::onOtplessResult);
 
-            }
-        });
-
-
-        binding.login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                viewModel.initiateWhatsAppLogin();
-
-            }
-        });
+        binding.login.setOnClickListener(view -> viewModel.initiateWhatsAppLogin());
 
         viewModel.getIntentLiveData().observe(this, intent -> {
             if (intent != null) {
