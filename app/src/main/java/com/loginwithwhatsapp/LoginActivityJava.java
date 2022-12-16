@@ -61,7 +61,7 @@ public class LoginActivityJava extends AppCompatActivity {
             if (verifyUserData != null) {
                 binding.login.setVisibility(View.GONE);
                 binding.successLogin.setVisibility(View.VISIBLE);
-                binding.successLogin.setText("Successful login by ${it.name} with phone number XXXXXXXXXX");
+                binding.successLogin.setText(String.format("Successful login by %s with phone number XXXXXXXXXX", verifyUserData.getName()));
 
             }
         });
